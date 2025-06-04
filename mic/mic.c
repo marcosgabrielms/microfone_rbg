@@ -25,6 +25,8 @@ float mic_read_db() {
     }
     float average = sum / (float)samples; // Calcula a média das amostras
 
+    if (average < 5.0f) return 0.0f;
+
     // Converte a média ADC para tensão (0-3.3V)
     float voltage = average * 3.3f / 4095.0f;
 
@@ -32,6 +34,12 @@ float mic_read_db() {
     // Assume um offset DC de ~0.5V e mapeia a variação para uma faixa de dB.
     // O resultado NÃO é um valor dB SPL padrão, mas uma representação relativa.
     // Valores (0.5V, 100.0, 60.0) podem precisar de ajuste para seu microfone específico.
+    
+    // Suavização
+    static float last_voltage = 0.0f;
+    voltage = 0.5f * last_voltage + 0.5f * voltage;
+    last_voltage = voltage;
+
     float db = (voltage - 0.5f) * 100.0f + 60.0f;
     return db;
 }
