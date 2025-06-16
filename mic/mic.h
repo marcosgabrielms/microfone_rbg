@@ -2,8 +2,9 @@
 #ifndef MIC_H      
 #define MIC_H
 
-#define LIMITE_DB_BAIXO_MODERADO 40.0f
-#define LIMITE_DB_MODERADO_ALTO 100.0f
+#define LIMITE_DB_BAIXO 80.0f
+#define LIMITE_DB_MODERADO 100.0f
+#define LIMITE_DB_ALTO 140.0f
 
 // Inicializa o hardware do microfone (ADC)
 void mic_init();
