@@ -14,9 +14,9 @@ int main() {
         printf("Decibéis: %.2f dB\n", db); // Imprime o valor lido
 
         // Define a cor do LED com base no nível de som
-        if (db < LIMITE_DB_BAIXO_MODERADO) {
+        if (db < LIMITE_DB_BAIXO) {
             led_set_rgb(0, 255, 0); // Azul para som baixo
-        } else if (db < LIMITE_DB_MODERADO_ALTO) {
+        } else if (db < LIMITE_DB_ALTO) {
             led_set_rgb(255, 0, 0); // Verde para som moderado
         } else {
             led_set_rgb(0, 0,255); // Vermelho para som alto
