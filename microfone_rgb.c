@@ -1,28 +1,51 @@
-#include <stdio.h>          // Para printf (saída padrão)
-#include "pico/stdlib.h"    // Biblioteca padrão do Pico (essencial)
-#include "mic/mic.h"        // Funções do módulo de microfone
-#include "led/led.h"        // Funções do módulo de LED RGB
-#include "utils/utils.h"    // Funções utilitárias (se houver)
+#include <stdio.h>
+#include "pico/stdlib.h"
+#include "pico/time.h"
+#include "mic/mic.h"
+#include "led/led.h"
+#include "utils/utils.h"
 
 int main() {
-    stdio_init_all(); // Inicializa a comunicação serial/USB para printf
-    mic_init();       // Inicializa o microfone
-    led_init();       // Inicializa o LED RGB
+    // 1. Inicialização
+    stdio_init_all(); 
+    mic_init();       
+    led_init();       
+    sleep_ms(2000);
+    absolute_time_t last_print_time = get_absolute_time();
+    const int64_t print_interval_us = 200000;
+    printf("--- Lógica de LED e Limites Revisada ---\n");
+    fflush(stdout);
 
-    while (true) { // Loop principal infinito
-        float db = mic_read_db(); // Lê o nível de som (em uma escala tipo dB)
-        printf("Decibéis: %.2f dB\n", db); // Imprime o valor lido
+    // 2. Loop Principal Infinito
+    while (true) {
+        float sound_level = mic_get_level();
 
-        // Define a cor do LED com base no nível de som
-        if (db < LIMITE_DB_BAIXO) {
-            led_set_rgb(0, 255, 0); // Azul para som baixo
-        } else if (db < LIMITE_DB_ALTO) {
-            led_set_rgb(255, 0, 0); // Verde para som moderado
-        } else {
-            led_set_rgb(0, 0,255); // Vermelho para som alto
+        // --- Lógica de Decisão Final e Clara ---
+        // Este código assume uma fiação PADRÃO (R->Vermelho, G->Verde, B->Azul)
+
+        if (sound_level >= LIMITE_SOM_ALTO) {
+            // NÍVEL ALTO: Deve acender o LED Vermelho
+            led_set_rgb(0, 0, 255); 
+        } 
+        else if (sound_level >= LIMITE_SOM_BAIXO) {
+            // NÍVEL MÉDIO: Deve acender o LED Verde
+            led_set_rgb(255, 0, 0); 
+        } 
+        else {
+            // NÍVEL BAIXO: Deve acender o LED Azul
+            led_set_rgb(0, 255, 0); 
         }
-        sleep_ms(300); // Aguarda 300 milissegundos antes da próxima leitura
+
+        // Lógica de impressão no monitor
+        absolute_time_t current_time = get_absolute_time();
+        if (absolute_time_diff_us(last_print_time, current_time) > print_interval_us) {
+            printf("Nível: %.2f\n", sound_level);
+            fflush(stdout);
+            last_print_time = current_time;
+        }
+
+        sleep_ms(10); 
     }
-    
+
     return 0; 
 }
