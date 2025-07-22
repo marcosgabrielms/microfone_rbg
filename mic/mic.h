@@ -2,14 +2,13 @@
 #ifndef MIC_H      
 #define MIC_H
 
-#define LIMITE_DB_BAIXO 80.0f
-#define LIMITE_DB_MODERADO 100.0f
-#define LIMITE_DB_ALTO 140.0f
+//Novos limites baseados na amplitude (0 a 4095).
+//Esses valores são apenas para testes, necessitando ajustá-los.
 
-// Inicializa o hardware do microfone (ADC)
+#define LIMITE_SOM_BAIXO 600.0f
+#define LIMITE_SOM_ALTO 1700.0f
+
 void mic_init();
+float mic_get_level();
 
-// Lê o nível de som do microfone e retorna uma estimativa em dB
-float mic_read_db();
-
-#endif // MIC_H
+#endif //MIC_H.
