@@ -11,7 +11,7 @@
 static void pwm_setup(uint pin) {
     gpio_set_function(pin, GPIO_FUNC_PWM);      // Define o pino para operar como PWM
     uint slice = pwm_gpio_to_slice_num(pin);    // Obtém o "slice" (unidade PWM) do pino
-    pwm_set_wrap(slice, 255);                   // Define o valor máximo do contador PWM (resolução 0-255)
+    pwm_set_wrap(slice, 150);                   // Define o valor máximo do contador PWM (resolução 0-255)
     pwm_set_enabled(slice, true);               // Ativa o PWM para este slice
 }
 
