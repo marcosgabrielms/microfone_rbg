@@ -1,10 +1,12 @@
 #include "pico/stdlib.h"  // SDK padrão do Pico
 #include "hardware/adc.h" // Funções do Conversor Analógico-Digital (ADC)
 #include "mic.h"          // Header deste módulo de microfone
-#include <math.h>         // Funções matemáticas (não usado diretamente aqui, mas incluído)
+#include "utils/utils.h"
 
-// Define o canal ADC para o microfone. GP28 é ADC2.
-#define MIC_ADC_CHANNEL 2
+
+
+#define MIC_ADC_CHANNEL 2  // Canal ADC(GP28 = ADC2)
+#define ALPHA 0.3f // Fator de suavização exponencial
 
 // Inicializa o ADC para leitura do microfone
 void mic_init() {
@@ -17,19 +19,14 @@ void mic_init() {
 // O valor retornando é um representação do volume, não um dB real.
 
 float mic_get_level() {
-    const int samples = 256;    //Um número maior de amostras para capturar a onda
+    const int samples = 100;    //Um número maior de amostras para capturar a onda
     uint16_t max_val = 0;
     uint16_t min_val = 4095;
 
     for (int i = 0; i < samples; i++) {
         uint16_t reading = adc_read();
-        if (reading > max_val) {
-            max_val = reading;
-        }
-        if (reading < min_val) {
-            min_val = reading;
-        }
-        sleep_ms(50); //Pausa curta para amostrar em diferentes partes da onda
+        if (reading > max_val) max_val = reading;
+        if (reading < min_val) min_val = reading;
     }
 
     //calcula a amplitude pico a pico
@@ -37,7 +34,7 @@ float mic_get_level() {
 
     //Suavização simples para estabilizar a leitura
     static float last_amplitude = 0.0f;
-    amplitude = 0.7f * last_amplitude + 0.3f * amplitude;
+    amplitude = (1.0f - ALPHA) * last_amplitude + ALPHA * amplitude;
     last_amplitude = amplitude;
 
     //Retorna a amplitude (escala de 0 a 4095)
