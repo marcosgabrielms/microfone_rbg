@@ -15,16 +15,23 @@ int main() {
     stdio_init_all();
     mic_init();
     led_init();
-    sleep_ms(2000);
+
+    sleep_ms(1000);
+    calibrar_limites_automaticamente(10000);
+
+    sleep_ms(500);
 
     absolute_time_t last_print_time = get_absolute_time();
     const int64_t print_interval_us = 200000;
+    float soma = 0.0f;
+    int contador = 0;
 
-    printf("--- Lógica de LED e Limites Revisada ---\n");
+    printf("--- Iniciando detecção ---\n");
     fflush(stdout);
 
     while (1) {
         float sound_level = mic_get_level();
+
         NivelSom nivel;
 
         if (sound_level >= LIMITE_SOM_ALTO)
@@ -51,6 +58,17 @@ int main() {
             printf("Nível: %.2f\n", sound_level);
             fflush(stdout);
             last_print_time = current_time;
+        }
+        // Acumulador e média de 20 amostras
+        soma += sound_level;
+        contador++;
+
+        if (contador == 20) {
+            float media = soma / 20.0f;
+            printf("[20 amostras] Média de Nível: %.2f\n", media);
+            fflush(stdout);
+            soma = 0.0f;
+            contador = 0;
         }
 
         sleep_ms(300); // 300 ms entre leituras — OK se deseja menos frequência
