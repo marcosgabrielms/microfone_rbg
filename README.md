@@ -8,9 +8,9 @@ Este projeto utiliza um microfone para capturar o nível de som ambiente e um LE
 * Cálculo da amplitude do sinal sonoro para medir a intensidade.
 * Exibição do nível de amplitude no monitor serial para depuração e visualização.
 * Controle de um LED RGB para mudar de cor com base na intensidade do som detectado:
-    * **Vermelho:** Som baixo (nível de amplitude abaixo do `LIMITE_SOM_BAIXO`).
+    * **Azul:** Som baixo (nível de amplitude abaixo do `LIMITE_SOM_BAIXO`).
     * **Verde:** Som moderado (nível de amplitude entre `LIMITE_SOM_BAIXO` e `LIMITE_SOM_ALTO`).
-    * **Azul:** Som alto (nível de amplitude acima do `LIMITE_SOM_ALTO`).
+    * **Vermelho:** Som alto (nível de amplitude acima do `LIMITE_SOM_ALTO`).
 
 ## ⚙️ Hardware Utilizado
 
