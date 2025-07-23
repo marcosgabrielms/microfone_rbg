@@ -5,12 +5,12 @@ Este projeto utiliza um microfone para capturar o nível de som ambiente e um LE
 ## ❯ Funcionalidades Principais
 
 * Leitura contínua do nível de som ambiente através de um módulo de microfone conectado ao ADC.
-* Cálculo de uma representação simplificada do nível de som em decibéis (dB).
-* Exibição do valor de "dB" no monitor serial para depuração e visualização.
+* Cálculo da amplitude do sinal sonoro para medir a intensidade.
+* Exibição do nível de amplitude no monitor serial para depuração e visualização.
 * Controle de um LED RGB para mudar de cor com base na intensidade do som detectado:
-    * **Azul:** Som baixo (definido no código como < 45.0 na escala dB interna).
-    * **Verde:** Som moderado (definido no código como <= 75.0 na escala dB interna).
-    * **Vermelho:** Som alto (definido no código como > 75.0 na escala dB interna).
+    * **Vermelho:** Som baixo (nível de amplitude abaixo do `LIMITE_SOM_BAIXO`).
+    * **Verde:** Som moderado (nível de amplitude entre `LIMITE_SOM_BAIXO` e `LIMITE_SOM_ALTO`).
+    * **Azul:** Som alto (nível de amplitude acima do `LIMITE_SOM_ALTO`).
 
 ## ⚙️ Hardware Utilizado
 
@@ -20,7 +20,7 @@ Este projeto utiliza um microfone para capturar o nível de som ambiente e um LE
 
 ## 💡 Como Funciona
 
-O microcontrolador RP2040, através do seu conversor analógico-digital (ADC), lê os valores do sensor de microfone. Esses valores são processados para obter uma média que é então convertida para uma escala arbitrária de decibéis. Com base nessa leitura, o programa principal (`microfone_rgb.c`) atualiza a cor de um LED RGB. As intensidades de cada cor (Vermelho, Verde, Azul) são controladas usando modulação por largura de pulso (PWM). O valor de decibéis também é enviado para o monitor serial.
+O microcontrolador RP2040, através do seu conversor analógico-digital (ADC), lê os valores do sensor de microfone. Esses valores são processados para obter a amplitude do sinal sonoro. Com base nessa leitura, o programa principal (`microfone_rgb.c`) atualiza a cor de um LED RGB. As intensidades de cada cor (Vermelho, Verde, Azul) são controladas usando modulação por largura de pulso (PWM). O valor da amplitude também é enviado para o monitor serial.
 
 ## 📁 Estrutura do Código
 
@@ -54,6 +54,6 @@ Este projeto é configurado para ser compilado usando o SDK do Raspberry Pi Pico
     * Alternativamente, use `picotool load seu_programa.uf2 -fx` se tiver o picotool configurado.
 
 4.  **Visualizar a Saída:**
-    * Abra um monitor serial conectado à porta USB da BitDogLab (configurado para 115200 baud) para ver as leituras de "Decibéis".
+    * Abra um monitor serial conectado à porta USB da BitDogLab (configurado para 115200 baud) para ver as leituras de "Nível".
 
 ---
