@@ -40,7 +40,12 @@ add_executable(microfone_rgb
     mic/mic.c
     led/led.c
     utils/utils.c
-    )
+    matriz/matriz.c
+)
+
+add_subdirectory(
+    lib/RP2040-WS2812B-Animation
+)
 
 pico_set_program_name(microfone_rgb "microfone_rgb")
 pico_set_program_version(microfone_rgb "0.1")
@@ -49,12 +54,22 @@ pico_set_program_version(microfone_rgb "0.1")
 pico_enable_stdio_uart(microfone_rgb 0)
 pico_enable_stdio_usb(microfone_rgb 1)
 
+pico_generate_pio_header(microfone_rgb ${CMAKE_CURRENT_LIST_DIR}/lib/RP2040-WS2812B-Animation/ws2812.pio)
+
+target_sources(microfone_rgb PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}/lib/RP2040-WS2812B-Animation/ws2812b_animation.c
+)
+
 # Add the standard include files to the build
 target_include_directories(microfone_rgb PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
         ${CMAKE_CURRENT_LIST_DIR}/mic
         ${CMAKE_CURRENT_LIST_DIR}/utils
         ${CMAKE_CURRENT_LIST_DIR}/led
+        ${CMAKE_CURRENT_LIST_DIR}/lib
+        ${CMAKE_CURRENT_LIST_DIR}/lib/RP2040-WS2812B-Animation/inc
+        ${CMAKE_CURRENT_LIST_DIR}/lib/RP2040-WS2812B-Animation/inc/CP0-EU
+        ${CMAKE_CURRENT_LIST_DIR}/lib/RP2040-WS2812B-Animation/inc/utf8-iterator/source
 )
 
 # Add any user requested libraries
@@ -63,7 +78,29 @@ target_link_libraries(microfone_rgb
     hardware_pwm
     hardware_adc
     hardware_gpio
+    ws2812b_animation
 )
 
 pico_add_extra_outputs(microfone_rgb)
 
+# Configuração da biblioteca ws2812b_animation
+set(TARGET_NAME "ws2812b_animation")
+
+if (NOT TARGET ${TARGET_NAME})
+    add_library(${TARGET_NAME} INTERFACE)
+
+    target_sources(${TARGET_NAME} INTERFACE
+        ${CMAKE_CURRENT_LIST_DIR}/lib/RP2040-WS2812B-Animation/ws2812b_animation.c
+        ${CMAKE_CURRENT_LIST_DIR}/lib/RP2040-WS2812B-Animation/inc/utf8-iterator/source/utf-8.c
+    )
+
+    target_include_directories(${TARGET_NAME} INTERFACE
+        ${CMAKE_CURRENT_LIST_DIR}/lib/RP2040-WS2812B-Animation/inc
+        ${CMAKE_CURRENT_LIST_DIR}/lib/RP2040-WS2812B-Animation/inc/CP0-EU
+        ${CMAKE_CURRENT_LIST_DIR}/lib/RP2040-WS2812B-Animation/inc/utf8-iterator/source
+    )
+
+    target_link_libraries(${TARGET_NAME} INTERFACE
+        hardware_pio
+    )
+endif()

@@ -4,17 +4,15 @@
 #include "mic/mic.h"
 #include "led/led.h"
 #include "utils/utils.h"
-
-typedef enum {
-    NIVEL_BAIXO,
-    NIVEL_MEDIO,
-    NIVEL_ALTO
-} NivelSom;
+#include "matriz/matriz.h"
 
 int main() {
     stdio_init_all();
     mic_init();
-    led_init();
+    inicializar_matriz();
+
+    limpar_matriz();
+    renderizar();
 
     sleep_ms(1000);
     calibrar_limites_automaticamente(10000);
@@ -32,26 +30,7 @@ int main() {
     while (1) {
         float sound_level = mic_get_level();
 
-        NivelSom nivel;
-
-        if (sound_level >= LIMITE_SOM_ALTO)
-            nivel = NIVEL_ALTO;
-        else if (sound_level >= LIMITE_SOM_BAIXO)
-            nivel = NIVEL_MEDIO;
-        else
-            nivel = NIVEL_BAIXO;
-
-        switch (nivel) {
-            case NIVEL_ALTO:
-                led_set_rgb(0, 0, 150);
-                break;
-            case NIVEL_MEDIO:
-                led_set_rgb(0, 150, 0);
-                break;
-            case NIVEL_BAIXO:
-                led_set_rgb(150, 0, 0);
-                break;
-        }
+        int qtd_leds_acessos = 0;
 
         absolute_time_t current_time = get_absolute_time();
         if (absolute_time_diff_us(last_print_time, current_time) > print_interval_us) {
@@ -62,14 +41,33 @@ int main() {
         // Acumulador e média de 20 amostras
         soma += sound_level;
         contador++;
+        float media;
 
-        if (contador == 20) {
-            float media = soma / 20.0f;
+        if (contador == 5) {
+            media = soma / 5.0f;
             printf("[20 amostras] Média de Nível: %.2f\n", media);
             fflush(stdout);
             soma = 0.0f;
             contador = 0;
         }
+
+        if (LIMITE_SOM_ALTO > LIMITE_SOM_BAIXO)
+        {
+            qtd_leds_acessos = ((media - LIMITE_SOM_BAIXO) / (LIMITE_SOM_ALTO - LIMITE_SOM_BAIXO) * QTD_LEDS);
+        }
+        
+        if (qtd_leds_acessos > QTD_LEDS)
+        {
+            qtd_leds_acessos = QTD_LEDS;
+        }
+
+        if (qtd_leds_acessos < 0)
+        {
+            qtd_leds_acessos = 0;
+        }
+
+        atualizar_ledbar(qtd_leds_acessos);
+        renderizar();
 
         sleep_ms(300); // 300 ms entre leituras — OK se deseja menos frequência
     }
